@@ -1,8 +1,13 @@
-// On import les utilisateurs
+/* eslint-disable no-underscore-dangle */
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const saltRound = 10;
 
-const User = require('./../models/users');
+const User = require('../models/users');
+
+const generateToken = (payload, secret, lifeTime) =>
+    jwt.sign(payload, secret, { expiresIn: lifeTime });
 
 /**
  *
@@ -20,16 +25,17 @@ exports.getAllUsers = async (req, res) => {
  */
 exports.getOneUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id, {
+            password: 0,
+            __v: 0,
+            _id: 0,
+        });
         if (!user) {
             res.status(404).json({
                 message: 'user not found',
             });
         }
-
-        const userObject = JSON.parse(JSON.stringify(user));
-        delete userObject.password;
-        res.status(200).json(userObject);
+        res.status(200).json(user);
     } catch (error) {
         res.status(500).json('user request fail');
     }
@@ -56,7 +62,7 @@ exports.createUser = async (req, res) => {
         const userObject = JSON.parse(JSON.stringify(user));
         // On supprime le mot de passe de l'objet à renvoyer au client
         delete userObject.password;
-        res.status(201).json(req.body);
+        res.status(201).json(userObject);
     } catch (error) {
         res.status(500).json({ message: 'register failed!' });
     }
@@ -70,11 +76,11 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, {
+        await User.findByIdAndUpdate(req.params.id, {
             ...req.body,
         });
-
-        res.status(200).json(user);
+        const updatedUser = await User.findById(req.params.id);
+        res.status(200).json(updatedUser);
     } catch (error) {
         res.status(500).json({ message: 'register failed!' });
     }
@@ -86,5 +92,81 @@ exports.deleteUser = async (req, res) => {
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: 'register failed!' });
+    }
+};
+
+exports.loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({
+            email,
+        });
+        if (!user) {
+            const error = new Error('email ou mot de passe incorrect');
+            error.code = 422;
+            throw error;
+        }
+
+        const checkPassword = bcrypt.compareSync(password, user.password);
+        if (!checkPassword) {
+            const error = new Error('email ou mot de passe incorrect');
+            error.code = 422;
+            throw error;
+        }
+        const payload = {
+            id: user._id,
+            name: `${user.firstname} ${user.lastname}`,
+        };
+        // token
+        const token = generateToken(payload, process.env.JWT_SECRET, '15m');
+        /* eslint-desable no-underscore-dangle */
+        const refreshToken = generateToken(
+            payload,
+            process.env.JWT_REFRESH_SECRET,
+            '7h'
+        );
+        /* eslint-desable no-underscore-dangle */
+        res.status(200).json({
+            token,
+            refreshToken,
+        });
+    } catch (error) {
+        const statusCode = error.code ?? 500;
+        res.status(statusCode).json({
+            message:
+                "Le service est indisponible pour le moment, merci de résssayer plus tard ou de contacter l'administrateur du site si l'erreur persiste",
+        });
+    }
+};
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+exports.refreshUserToken = async (req, res) => {
+    const authHeaders = req.headers?.authorization;
+
+    const autToken = authHeaders.split(' ')[1];
+
+    if (!autToken) {
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const user = await jwt.verify(autToken, process.env.JWT_REFRESH_SECRET);
+        delete user.iat;
+        delete user.exp;
+        const token = generateToken(user, process.env.JWT_SECRET, '15m');
+        const refreshToken = generateToken(
+            user,
+            process.env.JWT_REFRESH_SECRET,
+            '7h'
+        );
+        res.status(200).json({
+            token,
+            refreshToken,
+        });
+    } catch (error) {
+        res.status(401).json({ message: 'Unauthorized' });
     }
 };
