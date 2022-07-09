@@ -1,3 +1,5 @@
 // jest.setup.js
 // jest.setTimeout(90000);
-jest.useFakeTimers('legacy');
+// jest.useFakeTimers();
+
+jest.setTimeout(100000);

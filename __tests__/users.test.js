@@ -11,6 +11,8 @@ const usersFaker = require('../constants/usersFaker');
 
 const User = require('../models/users');
 
+// jest.useFakeTimers('legacy');
+
 beforeAll(async () => {
     const db = await getDbInstance();
     await db.connection.close();
