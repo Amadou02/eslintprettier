@@ -12,7 +12,6 @@ const usersFaker = require('../constants/usersFaker');
 const User = require('../models/users');
 
 beforeAll(async () => {
-    jest.setTimeout(100000);
     const db = await getDbInstance();
     await db.connection.close();
 
