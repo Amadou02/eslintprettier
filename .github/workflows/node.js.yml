@@ -7,13 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  DB_DEV_URI: ${{secrets.DB_DEV_URI}}
-  DB_TEST_URI: ${{secrets.DB_TEST_URI}}
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,8 +23,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: 'Add env vars to env'
-      uses: CallePuzzle/envvar-to-dotenv-action@0.1.0
+      uses: SpicyPizza/create-envfile@v1.3
       with:
-        variableNames: DB_DEV_URI, DB_TEST_URI
+        envkey_DEBUG: false
+        envkey_DB_DEV_URI: ${{secrets.DB_DEV_URI}}
+        envkey_DB_TEST_URI: ${{secrets.DB_TEST_URI}}
     - run: yarn
     - run: yarn test
