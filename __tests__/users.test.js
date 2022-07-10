@@ -18,8 +18,7 @@ beforeAll(async () => {
         // await db.connection.close();
         const db = await getDbInstance();
         await db.connection.close();
-        const uri =
-            'mongodb+srv://projet_dev:Lamanu80@cluster0.cfw14hk.mongodb.net/api_express_test?retryWrites=true&w=majority';
+        const uri = process.env.DB_TEST_URI;
         await mongoose.connect(uri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
