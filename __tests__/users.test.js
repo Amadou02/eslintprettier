@@ -1,26 +1,30 @@
+/* eslint-disable no-console */
 /* eslint-disable no-underscore-dangle */
 const request = require('supertest');
 require('dotenv').config();
 const mongoose = require('mongoose');
 
 const getDbInstance = require('../helper/database');
-
 const app = require('../app');
 
 const usersFaker = require('../constants/usersFaker');
 
 const User = require('../models/users');
 
-// jest.useFakeTimers('legacy');
-
 beforeAll(async () => {
-    const db = await getDbInstance();
-    await db.connection.close();
+    // await mongoose.disconnect();
 
-    await mongoose.connect(process.env.DB_TEST_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    try {
+        // await db.connection.close();
+        const db = await getDbInstance();
+        await db.connection.close();
+        await mongoose.connect(process.env.DB_TEST_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
 
     await User.insertMany(usersFaker);
 });

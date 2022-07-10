@@ -2,4 +2,4 @@
 // jest.setTimeout(90000);
 // jest.useFakeTimers();
 
-jest.setTimeout(100000);
+jest.setTimeout(90000);
