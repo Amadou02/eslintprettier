@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 
 const getDbInstance = () => {
     try {
-        const uri =
-            'mongodb+srv://projet_dev:Lamanu80@cluster0.cfw14hk.mongodb.net/api_express_dev?retryWrites=true&w=majority';
+        const uri = process.env.DB_DEV_URI;
         const db = mongoose.connect(uri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
