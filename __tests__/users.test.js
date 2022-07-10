@@ -18,6 +18,9 @@ beforeAll(async () => {
         // await db.connection.close();
         const db = await getDbInstance();
         await db.connection.close();
+        console.log('====================================');
+        console.log(process.env.DB_TEST_URI);
+        console.log('====================================');
         await mongoose.connect(process.env.DB_TEST_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
