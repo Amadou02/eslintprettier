@@ -23,7 +23,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: 'Add env vars to env'
-      uses: SpicyPizza/create-envfile@v1.3
+      uses: SpicyPizza/create-envfile@v1.3.1
       with:
         envkey_DEBUG: false
         envkey_DB_DEV_URI: ${{secrets.DB_DEV_URI}}

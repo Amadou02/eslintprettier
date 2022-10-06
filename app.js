@@ -5,6 +5,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+// doc swagger
+const swaggerUI = require('swagger-ui-express');
+
+const swaggerDoc = require('./docs/swagger');
+
 const usersRouter = require('./routes/users');
 const getDbInstance = require('./helper/database');
 
@@ -21,5 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/users', usersRouter);
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 
 module.exports = app;

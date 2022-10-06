@@ -19,5 +19,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: 'lamanunode-ci-cd' #Must be unique in Heroku
+          heroku_app_name: 'lm-ci-ci-nodejs' #Must be unique in Heroku
           heroku_email: ${{secrets.HEROKU_USER_EMAIL}}
