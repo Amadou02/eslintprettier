@@ -16,7 +16,10 @@ const generateToken = (payload, secret, lifeTime) =>
  */
 exports.getAllUsers = async (req, res) => {
     const users = await User.find({}, { password: 0 });
-    res.status(200).json(users);
+    res.status(200).json({
+        count: users.length,
+        results: users,
+    });
 };
 /**
  *
